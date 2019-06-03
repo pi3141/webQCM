@@ -111,7 +111,7 @@ your question
 ### image
 image url. If there is no image leave blank.
 
-###tip
+### tip
 a tip which is displayed after the answer is validated. Can contain method to find answer.
 
 ### r1,r2,...
