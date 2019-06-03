@@ -1,4 +1,4 @@
-#webQCM doc (english version below)
+# webQCM doc (english version below)
 
 Questionnaire à choix multiple avec identification de l'élève et statistiques.
 
@@ -52,7 +52,7 @@ il y a 12 champs : type;question;image;tip;r1;r2;r3;r4;r5;r6;r7;r8
 
     Pour visualiser les statistiques, il suffit d'aller sur webQCM/myStatV sur votre serveur.
 
-#webQCM doc
+# webQCM doc
 
 Multiple choice quiz with identification and statistics.
 
