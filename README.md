@@ -5,11 +5,17 @@ Questionnaire à choix multiple avec identification de l'élève et statistiques
 ## Fonctionnalités :
 
 ✓ création du questionnaire en éditant un simple fichier texte ;
+
 ✓ 3 types de questions possibles (choix multiple à une bonne réponses, choix multiple à plusieurs bonnes réponses, texte-réponse) ;
+
 ✓ possibilité de mettre des images ou du code latex dans les questions ;
+
 ✓ un commentaire apparaît après la question pour donner la réponse ou des conseils ;
+
 ✓ adapté pour les mobiles, tablettes ou PC ;
+
 ✓ un tableau recense les résultats pour chaque élève, le temps passé, etc ;
+
 ✓ mélange les questions et les réponses.
 
 ## Installation
@@ -59,11 +65,17 @@ Multiple choice quiz with identification and statistics.
 ## Features
 
 ✓ edit a text file to create your quiz
+
 ✓ 3 questions type (simple, multiple, and text answer)
+
 ✓ latex or image can be used
+
 ✓ a tip is shown after the question
+
 ✓ responsive
+
 ✓ statistics (score, time spend, ... )
+
 ✓ shuffle questions and answers
 
 ## Installation
@@ -99,7 +111,7 @@ There are 12 fields : type;question;image;tip;r1;r2;r3;r4;r5;r6;r7;r8
 
     r1,r2,... : answers
 
-    ### how can I choose which answer is correct
+### how can I choose which answer is correct
 
     In case of simple question : the first answer (r1) is the correct answer.
     In case of multiple question : put all the corrects answer in r1 field, all anwer has to be separated by "|".
