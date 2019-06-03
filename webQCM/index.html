@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quiz</title>
+<style type="text/css">
+body{
+margin:40px auto;
+max-width:650px;
+line-height:1.4;
+font-size:18px;
+color:#444;
+padding:0 10px;
+background-color:#29477F;
+}
+h1,h2,h3{
+line-height:1.2;
+}
+h2{
+color: #eee;
+text-shadow: 2px 2px 2px #222;
+/*text-align: center;*/
+font-weight:normal;
+}
+input,select{
+width:100%;
+font-size:110%;
+padding:.4em;
+margin:.2em;
+box-sizing:border-box;
+}
+.space{
+margin:1em;
+}
+.content{
+background-color:#999;
+padding:1em;
+}
+.questions{
+font-size:110%;
+color:black;
+line-height:1.2;
+/*font-weight:800;*/
+}
+input.selected{
+background-color:#33c;
+color:white;
+}
+.tip{
+overflow:auto;
+margin:.2em;
+display:none;
+color:white;
+padding:0;
+width:100%;
+box-sizing:border-box;
+box-shadow:2px 2px 4px black;
+}
+.tip p{
+padding:0 5px 0 5px;
+}
+input:disabled{
+opacity:.6;
+}
+.qImg{
+max-width: 100%;
+max-height: 400px;
+margin: auto;
+display: block;
+}
+
+</style>
+</head>
+<body>
+<div class="content">
+	<div class="questions">
+<!--	<p>Qui a élaboré la théorie de la relativité ?</p> -->
+	</div>
+	<div class="imgDiv"></div>
+
+	<div class="answers">
+<!--	<input type="button" value="Albert Einstein">
+	<input type="button" value="Albert le mousquetaire">
+	<input type="button" value="Einsestein"> -->
+	</div>
+	<div id="buttons">
+<!--<input type="button" value="Question suivante">
+	<input type="button" value="Valider"> -->
+	</div>
+	<div class="tip"></div>
+	<div class="space"></div>
+	<form method="get" target="_top" id="theForm">
+	</form>
+</div>
+<script src="../webQCM/fp2.js" ></script>
+<script src="../webQCM/timeme.min.js"></script>
+<script>
+//todo: shuffle quest, shuffle answer
+
+//glob var
+var quest = 0;
+var score = 0;
+var s_date;
+var s_time;
+var ts;
+var fp;
+var qTitle;
+var name="";
+var surname="";
+var classnr="";
+var qURL;
+
+function csvToArray(csv) {
+    rows = csv.split("\n").filter(function(el) {return el.length != 0});;
+	rows2 = shuffleArray(rows,3);
+
+    return rows.map(function (row) {
+    	return row.split(",");
+    });
+};
+function readCSV() {
+//read CSV
+	var xhr = new XMLHttpRequest();
+	xhr.timeout = 4000;
+	xhr.overrideMimeType("text/csv");
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            csvFile = csvToArray(xhr.responseText);
+//			var csvHeader=[];			
+//			for (let i=0;i<3;i++){			
+//			csvHeader[i]=csvFile[0];
+//			csvFile=csvFile.shift();
+//			}
+
+//			for (let i = csvFile.length - 1; i > 0; i--) {
+//	        const j = Math.floor(Math.random() * (i + 1));
+  //  	    [csvFile[i], csvFile[j]] = [csvFile[j], csvFile[i]];
+    //		}
+			
+//			for (let i=O; i<3;i++){
+	//		csvFile.unshift(csvHeader[i]);
+		//	}			
+
+			init();
+			return //csvToArray(xhr.responseText);
+        }
+    }
+    xhr.open('GET', 'questions.csv');
+    xhr.send();
+}
+
+function init(){
+
+// set qURL
+//var parts = window.location.href.split('/');
+//qURL = parts.pop() || parts.pop();  // handle potential trailing slash
+
+
+var parts = window.location.href.split( '/' );
+var rien= parts.pop() || parts.pop();
+qURL = parts.pop();
+
+
+//load fp processing
+if (window.requestIdleCallback) {
+    requestIdleCallback(function () {
+        Fingerprint2.get(function (components) {
+//          console.log(components) // an array of components: {key: ..., value: ...}
+          fp = Fingerprint2.x64hash128(components.map(function (pair) { return pair.value }).join(), 31);
+        });
+    })
+} else {
+    setTimeout(function () {
+        Fingerprint2.get(function (components) {
+//          console.log(components) // an array of components: {key: ..., value: ...}
+        })
+          fp = Fingerprint2.x64hash128(components.map(function (pair) { return pair.value }).join(), 31);
+    }, 500)
+}
+
+//extract and set title
+qTitle=csvFile[0];
+document.title=qTitle;
+
+
+
+
+var classNrChoices=(csvFile[1]+'').split(';');
+
+//create name, surname, class inputs
+var theFormForm = document.getElementById('theForm');
+var nameInput = document.createElement("INPUT");
+var surnameInput = document.createElement("INPUT");
+var classnrInput = document.createElement("SELECT");
+nameInput.classList.add('q0');
+nameInput.required;
+nameInput.setAttribute("required", "");
+nameInput.style.width = "100%";
+surnameInput.classList.add('q0');
+surnameInput.style.width = "100%";
+surnameInput.required;
+surnameInput.name="surname";
+surnameInput.setAttribute("required", "");
+classnrInput.classList.add('q0');
+classnrInput.style.width = "100%";
+classnrInput.setAttribute("required", "");
+classnrInput.name="classnr"
+nameInput.id = "name";
+nameInput.name="name";
+nameInput.placeholder = "Prénom";
+surnameInput.id = "surname";
+classnrInput.id = "classnr";
+surnameInput.placeholder = "Nom";
+classnrInput.innerHTML = "<option value=\"\" default disabled selected>classe</option>"
+
+classNrChoices.forEach(function(el){
+classnrInput.insertAdjacentHTML('beforeend', "<option value=\"" + el + "\" >" + el + "</option>");
+})
+
+//theForm.appendChild(nameInput);
+//theForm.appendChild(surnameInput);
+//theForm.appendChild(classnrInput);
+
+theFormForm.appendChild(nameInput);
+theFormForm.appendChild(surnameInput);
+theFormForm.appendChild(classnrInput);
+
+
+// Create validate button
+var buttons = document.getElementById('theForm');
+var valider = document.createElement("INPUT");
+valider.setAttribute("type","submit");
+valider.id = "valider";
+valider.setAttribute("value","Valider");
+valider.id = "okBtn";
+valider.style.width = "100%";
+//valider.onclick = validate;
+buttons.appendChild(valider);
+
+//check get parameters
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has('name')){
+name = urlParams.get('name');
+surname = urlParams.get('surname');
+classnr = urlParams.get('classnr');
+document.getElementById('okBtn').setAttribute("type","button");
+valider.onclick = validate;
+validate();
+return;
+}
+
+
+}
+
+function validate(){
+    if (quest == 0){
+        if (name == ""){
+    //this was the login page, save name/surname/class/start date-time
+    
+    //check validity
+    
+    name = document.getElementById('name').value;
+    surname = document.getElementById('surname').value;
+    classnr = document.getElementById('classnr').value;
+    }
+    var d = new Date(); 
+    s_date = ("0" + d.getFullYear()).slice(-2) + "-" + ("0" + (d.getMonth() + 1)).slice(-2) +"-" + ("0" + d.getDate()).slice(-2);
+    s_time = ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+    //remove name, surname, class
+    var q0el = document.getElementsByClassName('q0');
+    while(q0el.length > 0){q0el[0].parentNode.removeChild(q0el[0]);}
+	quest=1;
+	dispQuest();
+	//launch timer
+    TimeMe.initialize({
+		currentPagename: "quiz", // current page
+		idleTimeoutInSeconds: 30 // seconds
+	});
+	return;
+    }else{
+	//disabled q
+	var qel = document.getElementsByClassName('q');
+	for(var i = 0; i < qel.length; i++){qel[i].disabled = true};
+    var qline = (csvFile[quest + 1] + '').split(';');
+    //evaluate
+    switch(qline[0]){
+    case "t":
+        //evaluate text
+		qline_text=qline[4].split("|");
+		for (var i = 0; i<qline_text.length;i++){qline_text[i]=qline_text[i].toLowerCase()};
+        if (qline_text.includes(document.getElementsByClassName('q')[0].value.toLowerCase())){
+        tip(true,qline[3]);
+		score++;
+        }else{
+        tip(false,qline[3]);
+        }
+		//show good answer
+//		document.getElementsByClassName('q')[0].value = qline[3];
+        break;
+    case "m":
+        //evaluate mult
+
+		var correctRep = qline[4].split('|').concat().sort();
+
+		//color good answers, disabled
+//		let qm = document.getElementsByClassName('q');
+//		for (let i=0;i < qm.length;i++){
+//			for (let j=0;j< correctRep.length;j++){
+//				if (qm[i].value == correctRep[j]){
+//				qm[i].style.border = "thick solid green";			
+//				}
+//			}
+//		}
+
+		var sel = document.getElementsByClassName('selected')
+		var selVal = [];
+		for (let i = 0; i < sel.length; i++) {
+			selVal.push(sel[i].value);
+		//	selVal.[i]=sel[i].value;
+		}
+		selVal2 = selVal.concat().sort();
+        let isFalse = 0
+		let smthgTrue = 0
+        for (var i = 0; i < correctRep.length; ++i) {
+            if (correctRep[i] !== selVal2[i]){isFalse=1}else{smthgTrue=1};
+          }
+        if (isFalse == 0){
+		tip(true,qline[3]);
+		score++;
+		}else{
+			if(smthgTrue==0){
+				tip(false,qline[3]);
+				}else{
+					tip(false,qline[3],true);
+					}
+		}
+        break;
+    case "s":
+        //evaluate single
+
+		//color good answers
+//		let qs = document.getElementsByClassName('q');
+//		for (let i=0;i < qs.length;i++){
+//			if (qs[i].value == qline[3]){
+//			qs[i].style.border = "thick solid green";
+//			}
+//		}
+
+
+		if (document.querySelector('.selected') == null) {
+		rep = "";
+		}else{
+		rep = document.querySelector('.selected').value;
+		}
+        if (rep == qline[4]){
+        tip(true,qline[3]);
+		score++;
+        }else{
+        tip(false,qline[3]);
+        }
+        break;
+    }
+//change validate onclick
+okButton = document.getElementById("okBtn")
+okButton.onclick = next;
+okButton.style.backgroundColor = "#333";
+okButton.style.color = "#CCC";
+okButton.setAttribute("value","Suivant");
+}
+}
+
+function next() {
+    if(quest >= csvFile.length - 2)
+    {
+    callResults();
+    }else{
+	//remove prev question
+	document.getElementsByClassName('imgDiv')[0].innerHTML = ""; 
+	let tipDiv = document.getElementsByClassName("tip");
+	tipDiv[0].style.display = "none";
+    var el = document.getElementsByClassName("q");
+    while(el.length > 0){
+        el[0].parentNode.removeChild(el[0]);
+    	}
+    dispQuest(); //on reconstruit la question
+	//change validate onclick
+	okButton = document.getElementById("okBtn")
+	okButton.onclick = validate;
+	okButton.style.backgroundColor = "#f0f0f0";
+	okButton.style.color = "#444";
+	okButton.setAttribute("value","Valider");    
+	}
+}
+
+function tip(correct,tipText,somethingTrue){
+let tipDiv = document.getElementsByClassName("tip");
+if(correct){tipDiv[0].innerHTML = "<p style=\"background-color:green;font-weight:bold;margin:0;text-align:center;\">Correct</p>"
+}else{
+if(somethingTrue){
+tipDiv[0].innerHTML = "<p style=\"background-color:orange;font-weight:bold;margin:0;text-align:center;\">Incomplet</p>"
+}else{
+tipDiv[0].innerHTML = "<p style=\"background-color:red;font-weight:bold;margin:0;text-align:center;\">Faux</p>"
+}
+};
+
+tipDiv[0].innerHTML += "<p>" + tipText + "</p>";
+//if(correct){tipDiv[0].style.backgroundColor = "#4caf50"}else{tipDiv[0].style.backgroundColor = "red"};
+tipDiv[0].style.display = "block";
+}
+
+function dispQuest(){
+var qline = (csvFile[quest + 2] + '').split(';');
+var questionsDiv = document.getElementsByClassName('questions');
+questionsDiv[0].innerHTML = "<h2>" + qline[1] + "</h2>";
+//process img
+if ( ! qline[2] == ""){
+	document.getElementsByClassName('imgDiv')[0].innerHTML = "<img class=\"qImg\" src=" + qline[2] + " />"; 
+}
+//document.getElementsByClassName('imgDiv')[0].style.backgroundImage = "url(" + qline[2] + ")";
+var answersDiv = document.getElementsByClassName('answers');
+switch(qline[0]){
+    case "t":
+        var rep = document.createElement("INPUT");
+        rep.placeholder = "Votre réponse ici…";
+        rep.classList.add('q');
+        answersDiv[0].appendChild(rep);
+        break;
+    case "m":
+		//shuffle answers
+		qline_mult = qline.join("|").split("|")
+		var qlineS = shuffleArray(qline_mult,4);
+        for (i = 4; i < qlineS.length; i++){
+                let rep = document.createElement("INPUT");
+                rep.setAttribute('type','button');
+                rep.classList.add('q');
+                rep.id = i-2;
+                rep.value = qlineS[i];
+                rep.addEventListener("click", clickButton); 
+                answersDiv[0].appendChild(rep);
+            }     
+        break;
+    case "s":
+		//shuffle answers
+		var qlineS = shuffleArray(qline,4);
+        for (i = 4; i < qlineS.length; i++){
+                let rep = document.createElement("INPUT");
+                rep.setAttribute('type','button');
+                rep.classList.add('q');
+                rep.id = i-2;
+                rep.value = qlineS[i];
+                rep.addEventListener("click", clickButton); 
+                answersDiv[0].appendChild(rep);
+            }     
+        break;
+    }
+quest++;
+	}
+
+function clickButton(){
+var qline = (csvFile[quest + 1] + '').split(';');
+if(qline[0] == "m"){
+this.classList.toggle('selected');
+}else{
+if (document.getElementsByClassName('selected')[0]){
+document.getElementsByClassName('selected')[0].classList.remove('selected');
+}
+this.classList.add('selected');
+}
+}
+
+function callResults() {
+//create hidden form
+	let hForm = document.createElement("form");
+	hForm.setAttribute('method',"post");
+	hForm.setAttribute('action',"../webQCM/result.php");
+	hForm.id = "infos";
+	var ua = navigator.userAgent;
+	var ts = TimeMe.getTimeOnCurrentPageInSeconds();
+	var theForm = "<input type=\"hidden\" name=\"name\" value=" + name + " /><input type=\"hidden\" name=\"surname\" value=\"" + surname + "\" /><input type=\"hidden\" name=\"classe\" value=\"" + classnr + "\" /><input type=\"hidden\" name=\"sd\" value=\"" + s_date + "\" /><input type=\"hidden\" name=\"st\" value=\"" + s_time + "\" /><input type=\"hidden\" name=\"ts\" value=\"" + ts + "\" /><input type=\"hidden\" name=\"score\" value=\"" + (score / (quest - 1))*100 + "\" /><input type=\"hidden\" name=\"fp\" value=\"" + fp + "\"/><input type=\"hidden\" name=\"qTitle\" value=\"" + qTitle + "\"/><input type=\"hidden\" name=\"ua\" value=\"" + ua + "\"/><input type=\"hidden\" name=\"qURL\" value=\"" + qURL + "\"/>";
+	hForm.innerHTML = theForm;
+    document.getElementsByClassName('content')[0].appendChild(hForm);
+    document.getElementById("infos").submit();
+
+
+}
+function shuffleArray(ar,from){
+
+for (let i=ar.length-1;i >= from;i--){
+	let randomIndex = Math.floor(Math.random()*(i+1-from)+from);
+	let itemAtIndex = ar[randomIndex];
+	ar[randomIndex] = ar[i];
+	ar[i] = itemAtIndex;
+	}
+return ar;
+}
+
+var csvFile
+readCSV();
+</script>
+</body>
+</html>
