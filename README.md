@@ -1,4 +1,4 @@
-# webQCM doc [(english version below)](#web-QCM-doc-en)
+# webQCM doc fr [(english version below)](#webQCM-doc-en)
 
 Questionnaire à choix multiple avec identification de l'élève et statistiques.
 
