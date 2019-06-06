@@ -1,4 +1,4 @@
-# webQCM doc (english version below)
+# webQCM doc [(english version below)](#web-QCM-doc-en)
 
 Questionnaire à choix multiple avec identification de l'élève et statistiques.
 
@@ -65,7 +65,7 @@ Pour une réponse texte : Il n'y a que le champ r1. Toutes les réponses accept�
 
 Pour visualiser les statistiques, il suffit d'aller sur webQCM/myStatV sur votre serveur.
 
-# webQCM doc
+# webQCM doc en
 
 Multiple choice quiz with identification and statistics.
 
