@@ -1,4 +1,4 @@
-# [DEMO](https://pi3141.github.io/webQCM/webQCM)
+# [DEMO](http://littuzine.free.fr/3_meca)
 
 # webQCM doc fr [(english version below)](#webQCM-doc-en)
 
